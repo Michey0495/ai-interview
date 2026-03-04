@@ -34,8 +34,12 @@ const TOOL_DEFINITION = {
         type: "string",
         description: "Motivation for applying (optional)",
       },
+      apiKey: {
+        type: "string",
+        description: "Anthropic API key (required, starts with sk-ant-)",
+      },
     },
-    required: ["position"],
+    required: ["position", "apiKey"],
   },
 };
 
@@ -78,7 +82,15 @@ export async function POST(req: NextRequest) {
         });
       }
 
-      const anthropic = new Anthropic();
+      if (!args.apiKey || typeof args.apiKey !== "string" || !args.apiKey.startsWith("sk-ant-")) {
+        return NextResponse.json({
+          jsonrpc: "2.0",
+          id: body.id,
+          error: { code: -32602, message: "Valid Anthropic API key is required (apiKey)" },
+        });
+      }
+
+      const anthropic = new Anthropic({ apiKey: args.apiKey });
       const prompt = `あなたは大手企業の採用面接官です。厳しくも公正な目で候補者を評価してください。
 
 以下の候補者情報をもとに、模擬面接の評価を行ってください。

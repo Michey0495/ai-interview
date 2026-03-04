@@ -37,6 +37,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const apiKey = body.apiKey;
+    if (!apiKey || typeof apiKey !== "string" || !apiKey.startsWith("sk-ant-")) {
+      return NextResponse.json(
+        { error: "有効なAnthropic APIキーを設定してください" },
+        { status: 401 }
+      );
+    }
+
     const input: InterviewInput = {
       position: String(position).slice(0, 100),
       industry: String(industry ?? "").slice(0, 100),
@@ -45,7 +53,7 @@ export async function POST(req: NextRequest) {
       motivation: String(motivation ?? "").slice(0, 500),
     };
 
-    const anthropic = new Anthropic();
+    const anthropic = new Anthropic({ apiKey });
 
     const prompt = `あなたは大手企業の採用面接官です。厳しくも公正な目で候補者を評価してください。
 
@@ -90,11 +98,34 @@ ${input.motivation ? `- 志望動機: ${input.motivation}` : ""}
 - 評価は厳しめに。甘い評価は候補者のためにならない
 - アドバイスは具体的かつ実践的に`;
 
-    const message = await anthropic.messages.create({
-      model: "claude-haiku-4-5-20251001",
-      max_tokens: 1024,
-      messages: [{ role: "user", content: prompt }],
-    });
+    let message;
+    try {
+      message = await anthropic.messages.create({
+        model: "claude-haiku-4-5-20251001",
+        max_tokens: 1024,
+        messages: [{ role: "user", content: prompt }],
+      });
+    } catch (apiError: unknown) {
+      if (apiError instanceof Anthropic.AuthenticationError) {
+        return NextResponse.json(
+          { error: "APIキーが無効です。正しいキーを設定してください。" },
+          { status: 401 }
+        );
+      }
+      if (apiError instanceof Anthropic.RateLimitError) {
+        return NextResponse.json(
+          { error: "APIのレート制限に達しました。しばらく待ってから再試行してください。" },
+          { status: 429 }
+        );
+      }
+      if (apiError instanceof Anthropic.APIError && apiError.status === 402) {
+        return NextResponse.json(
+          { error: "APIの利用枠が不足しています。Anthropicダッシュボードで残高を確認してください。" },
+          { status: 402 }
+        );
+      }
+      throw apiError;
+    }
 
     const text =
       message.content[0].type === "text" ? message.content[0].text : "";

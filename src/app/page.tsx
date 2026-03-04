@@ -69,23 +69,27 @@ export default function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
 
-      <div className="text-center mb-10">
-        <p className="text-violet-400 text-sm font-bold tracking-widest mb-4">
-          無料・登録不要・30秒で結果
-        </p>
-        <h1 className="text-4xl font-black tracking-tight mb-3">
-          <span className="text-violet-400">{"//"}
-          </span> AI模擬面接
-        </h1>
-        <p className="text-white/70 text-lg leading-relaxed">
-          AIが<span className="text-violet-400 font-bold">厳しい面接官</span>
-          となり、あなたの面接力を
-          <span className="text-violet-400 font-bold">S~Dランク</span>
-          で判定
-        </p>
-        <p className="text-white/40 text-sm mt-2">
-          職種と自己PRを入力するだけ。本番さながらの質問と容赦ない評価。
-        </p>
+      <div className="relative overflow-hidden rounded-2xl mb-10">
+        <div className="absolute inset-0 bg-gradient-to-br from-violet-900/40 via-violet-950/20 to-transparent" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(139,92,246,0.15),transparent_70%)]" />
+        <div className="relative text-center py-14 px-4">
+          <p className="text-violet-400 text-sm font-bold tracking-widest mb-4">
+            無料・登録不要・30秒で結果
+          </p>
+          <h1 className="text-4xl font-black tracking-tight mb-3">
+            <span className="text-violet-400">{"//"}
+            </span> AI模擬面接
+          </h1>
+          <p className="text-white/70 text-lg leading-relaxed">
+            AIが<span className="text-violet-400 font-bold">厳しい面接官</span>
+            となり、あなたの面接力を
+            <span className="text-violet-400 font-bold">S~Dランク</span>
+            で判定
+          </p>
+          <p className="text-white/40 text-sm mt-2">
+            職種と自己PRを入力するだけ。本番さながらの質問と容赦ない評価。
+          </p>
+        </div>
       </div>
 
       {/* How it works */}
@@ -97,7 +101,7 @@ export default function Home() {
         ].map((item) => (
           <div
             key={item.step}
-            className="bg-white/5 border border-white/10 rounded-lg p-4 text-center"
+            className="bg-white/5 border border-white/10 rounded-lg p-4 text-center hover:bg-white/10 transition-all duration-300"
           >
             <div className="text-violet-400 font-black text-lg mb-1">
               {item.step}

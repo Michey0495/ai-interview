@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { ApiKeyInput, getApiKey } from "@/components/ApiKeyInput";
 
 export function InterviewForm() {
   const router = useRouter();
@@ -21,12 +22,17 @@ export function InterviewForm() {
       toast.error("希望職種を入力してください");
       return;
     }
+    const apiKey = getApiKey();
+    if (!apiKey) {
+      toast.error("Anthropic APIキーを設定してください");
+      return;
+    }
     setLoading(true);
     try {
       const res = await fetch("/api/interview", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, apiKey }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -43,6 +49,7 @@ export function InterviewForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
+      <ApiKeyInput />
       <div className="bg-white/5 rounded-xl p-6 border border-white/10 space-y-4">
         <div>
           <label htmlFor="position" className="block text-sm font-medium text-white/70 mb-1.5">
